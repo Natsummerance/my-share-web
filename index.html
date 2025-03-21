@@ -200,6 +200,10 @@
   </div>
   
   <script>
+    // 全局变量
+    let allMessages = []; // 保存所有聊天记录
+    let chartInstances = []; // 保存所有图表实例
+
     // 示例聊天记录（请替换为完整内容）
     fetch("text.json")
       .then(response => {
@@ -209,7 +213,9 @@
         return response.json();
       })
       .then(messages => {
-        renderMessages(messages);
+        allMessages = messages; // 保存聊天记录
+        renderMessages(messages); // 渲染聊天记录
+        renderAllCharts(messages); // 渲染图表
       })
       .catch(error => {
         console.error("无法加载聊天记录:", error);
@@ -802,7 +808,6 @@
     // ---------------------------
     // 全局变量及初始化
     // ---------------------------
-    let allMessages = [];
     
     function initChatLog() {
       allMessages = parseChatLog(chatText);
