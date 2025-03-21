@@ -16258,6 +16258,8 @@ ZF2出了，zf降价了不少
     function renderPagination(totalPages) {
       const container = document.getElementById('paginationControls');
       container.innerHTML = "";
+
+      // 上一页按钮
       const prevBtn = document.createElement('button');
       prevBtn.textContent = "上一页";
       prevBtn.onclick = () => { 
@@ -16266,7 +16268,9 @@ ZF2出了，zf降价了不少
           renderMessages(filteredMessages); 
         }
       };
-      const nextBtn = document.createElement('button');
+ 
+    // 下一页按钮
+     const nextBtn = document.createElement('button');
       nextBtn.textContent = "下一页";
       nextBtn.onclick = () => { 
         if (currentPage < totalPages) { 
@@ -16274,10 +16278,29 @@ ZF2出了，zf降价了不少
           renderMessages(filteredMessages); 
         }
       };
+
+      // 当前页信息
       const pageInfo = document.createElement('span');
       pageInfo.textContent = `第 ${currentPage} 页，共 ${totalPages} 页`;
+
+      // 页码跳转输入框
+      const pageInput = document.createElement('input');
+      pageInput.type = "number";
+      pageInput.min = 1;
+      pageInput.max = totalPages;
+      pageInput.value = currentPage;
+      pageInput.style.width = "50px";
+      pageInput.oninput = function () {
+        const value = parseInt(this.value);
+        if (!isNaN(value) && value >= 1 && value <= totalPages) {
+          currentPage = value;
+          renderMessages(filteredMessages);
+        }
+      };
+
       container.appendChild(prevBtn);
       container.appendChild(pageInfo);
+      container.appendChild(pageInput);
       container.appendChild(nextBtn);
     }
 
