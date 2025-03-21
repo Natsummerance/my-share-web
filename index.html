@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>聊天记录动态可视化与统计分析</title>
+  <title>云南大理演示研究所在凡尔赛宫的一号陈列馆</title>
   <style>
     body {
       font-family: "Microsoft YaHei", Arial, sans-serif;
@@ -25,25 +25,56 @@
     .chat-message {
       border-bottom: 1px solid #eee;
       padding: 10px 0;
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 5px;
     }
     .chat-message:last-child {
       border-bottom: none;
     }
     .meta {
+      display: flex;
+      justify-content: space-between;
       margin-bottom: 5px;
     }
     .timestamp {
-      color: #888;
+      color: #666;
+      background: #f9f9f9;
+      padding: 2px 5px;
+      border-radius: 3px;
       font-size: 0.9em;
     }
     .sender {
+      color: #666;
+      background: #f9f9f9;
+      padding: 2px 5px;
+      border-radius: 3px;
+      font-size: 0.9em;
       font-weight: bold;
-      margin-left: 10px;
-      color: #333;
     }
     .content {
-      white-space: pre-wrap;
-      line-height: 1.5;
+      color: #333;
+      background: #eee;
+      padding: 5px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      font-weight: bold;
+    }
+    /* 分页控制样式 */
+    .pagination {
+      text-align: center;
+      margin-top: 15px;
+    }
+    .pagination button {
+      padding: 5px 10px;
+      margin: 0 5px;
+      border: 1px solid #ccc;
+      background: #fff;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+    .pagination span {
+      margin: 0 10px;
     }
     .search-container {
       margin-bottom: 20px;
@@ -93,8 +124,8 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1>聊天记录动态可视化与统计分析</h1>
-      <p>嵌入式数据统计、图表与词云展示</p>
+      <h1>云南大理演示研究所在凡尔赛宫的一号陈列馆</h1>
+      <p>聊天记录动态可视化与嵌入式数据统计分析</p>
     </div>
     
     <div class="search-container">
@@ -163,6 +194,8 @@
           <!-- 聊天记录将动态生成 -->
           <p>正在加载记录…</p>
         </div>
+        <div class="pagination" id="paginationControls">
+        <!-- 分页按钮将动态生成 -->
       </div>
     </div>
   </div>
@@ -16182,6 +16215,10 @@ ZF2出了，zf降价了不少
       if (currentMessage) messages.push(currentMessage);
       return messages;
     }
+
+    // 新增变量：分页参数
+    let currentPage = 1;
+    const pageSize = 10; // 每页显示10条消息
     
     // 渲染聊天记录到页面
     function renderMessages(messages) {
@@ -16191,20 +16228,62 @@ ZF2出了，zf降价了不少
         chatLog.innerHTML = "<p>未找到相关记录。</p>";
         return;
       }
-      messages.forEach(msg => {
+      // 分页：计算总页数
+      const totalPages = Math.ceil(messages.length / pageSize);
+      // 调整当前页范围
+      if (currentPage > totalPages) currentPage = totalPages;
+      if (currentPage < 1) currentPage = 1;
+      // 获取当前页消息
+      const startIndex = (currentPage - 1) * pageSize;
+      const pageMessages = messages.slice(startIndex, startIndex + pageSize);
+      
+      // 渲染当前页每条消息
+      pageMessages.forEach(msg => {
         const div = document.createElement('div');
         div.className = 'chat-message';
         div.innerHTML = `
           <div class="meta">
-            <span class="timestamp">${msg.timestamp}</span>
-            <span class="sender">${msg.sender}</span>
+            <div class="sender">${msg.sender}</div>
+            <div class="timestamp">${msg.timestamp}</div>
           </div>
           <div class="content">${msg.content}</div>
         `;
         chatLog.appendChild(div);
       });
+      
+      renderPagination(totalPages);
     }
     
+    // 新增函数：渲染分页控件
+    function renderPagination(totalPages) {
+      const container = document.getElementById('paginationControls');
+      container.innerHTML = "";
+      const prevBtn = document.createElement('button');
+      prevBtn.textContent = "上一页";
+      prevBtn.onclick = () => { 
+        if (currentPage > 1) { 
+          currentPage--; 
+          renderMessages(filteredMessages); 
+        }
+      };
+      const nextBtn = document.createElement('button');
+      nextBtn.textContent = "下一页";
+      nextBtn.onclick = () => { 
+        if (currentPage < totalPages) { 
+          currentPage++; 
+          renderMessages(filteredMessages); 
+        }
+      };
+      const pageInfo = document.createElement('span');
+      pageInfo.textContent = `第 ${currentPage} 页，共 ${totalPages} 页`;
+      container.appendChild(prevBtn);
+      container.appendChild(pageInfo);
+      container.appendChild(nextBtn);
+    }
+
+    // 过滤时保存全局过滤结果以便分页使用
+    let filteredMessages = [];
+
     // ---------------------------
     // 统计函数
     // ---------------------------
@@ -16703,6 +16782,7 @@ ZF2出了，zf降价了不少
     
     function initChatLog() {
       allMessages = parseChatLog(chatText);
+      filteredMessages = allMessages; // 默认显示所有消息
       renderMessages(allMessages);
       // 这里修改为调用异步版本
       renderAllCharts(allMessages);
@@ -16721,6 +16801,7 @@ ZF2出了，zf降价了不少
           msg.content.toLowerCase().includes(keyword)
         );
       }
+      currentPage = 1; // 重置到第一页
       renderMessages(filtered);
       renderAllCharts(filtered);
     });
